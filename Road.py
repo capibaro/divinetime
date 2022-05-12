@@ -47,7 +47,7 @@ class Road(nn.Module):
         self.kernel_size = 3
         self.plus = 8
         self.embedding = nn.Embedding(128 * 128, 32)
-        emb_vectors = np.load('Config/embedding_128.npy')
+        emb_vectors = np.load('data/embedding_128.npy')
         self.embedding.weight.data.copy_(torch.from_numpy(emb_vectors))
         self.process_coords = nn.Linear(2 + 32, 32)
     #        for module in self.modules():
@@ -61,6 +61,11 @@ class Road(nn.Module):
         lats = torch.unsqueeze(traj['lats'], dim=2)
         grid_ids = torch.unsqueeze(traj['grid_id'].long(), dim=2)
         grids = torch.squeeze(self.embedding(grid_ids))
+
+        # print('lngs:', lngs.shape)
+        # print('lats:', lats.shape)
+        # print('grid_ids:', grid_ids.shape)
+        # print('grids:', grids.shape)
 
         locs = torch.cat([lngs, lats, grids], dim=2)
         locs = self.process_coords(locs)

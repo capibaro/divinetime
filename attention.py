@@ -49,7 +49,7 @@ class MultiHeadAttention(nn.Module):
         batch, n_k, d_k_ = k.size()
         batch, n_v, d_v_ = v.size()
 
-        q = self.fc_q(q) # 1.single head to multi head
+        q = self.fc_q(q) # 1.单头变多头
         k = self.fc_k(k)
         v = self.fc_v(v)
         q = q.view(batch, n_q, n_head, d_q).permute(2, 0, 1, 3).contiguous().view(-1, n_q, d_q)
@@ -58,10 +58,10 @@ class MultiHeadAttention(nn.Module):
 
         if mask is not None:
             mask = mask.repeat(n_head, 1, 1)
-        attn, output = self.attention(q, k, v, mask=mask) # 2.regard as single head attention to cal output
+        attn, output = self.attention(q, k, v, mask=mask) # 2.当成单头注意力求输出
 
         output = output.view(n_head, batch, n_q, d_v).permute(1, 2, 0, 3).contiguous().view(batch, n_q, -1) # 3.Concat
-        output = self.fc_o(output) # 4.transform affinely to get final output
+        output = self.fc_o(output) # 4.仿射变换得到最终输出
 
         return attn, output
 
