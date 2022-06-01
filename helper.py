@@ -89,12 +89,13 @@ def resample(coordinates):
 
 def transform(coords, distance, start, short_ttf, long_ttf, upstream):
     query = collections.defaultdict(lambda: [])
-    query['time'] = distance / (long_average_speed / 3.6)
-    query['time_gap'] = [0.0] + [query['time'] // (len(coords)-1)] * (len(coords) - 1)
     query['driverID'] = random.randint(1, 10039) - 1
     query['weekID'] = start.weekday()
     query['timeID'] = (start.hour * 60 + start.minute) // 15
     query['dateID'] = week[query['weekID']]
+    query['dist'] = distance
+    query['time'] = distance / (long_average_speed / 3.6)
+    query['time_gap'] = [0.0] + [query['time'] // (len(coords)-1)] * (len(coords) - 1)
     for i, coord in enumerate(coords):
         query['lngs'].append(coord[0])
         query['lats'].append(coord[1])
@@ -140,7 +141,6 @@ def transform(coords, distance, start, short_ttf, long_ttf, upstream):
             else:
                 length += cal_grid_len([coord[0]-border[0], coord[1]-border[1]], [coords[i+1][0]-border[0], coords[i+1][1]-border[1]], x, y)
         query['grid_len'].append(length)
-    query['dist'] = dist
     data = []
     for i in range(32):
         data.append(query)
@@ -243,9 +243,8 @@ def generate(pred_dict, attr):
     for i in range(pred_dict['pred'].size()[0]):
         dist_list.append(utils.unnormalize(attr['dist'].data[i], 'dist'))
         time_list.append(pred[i][0])
-    dist, time = np.mean(dist_list), np.mean(time_list)
+    time = np.mean(time_list)
     result = {
-        'dist': str(dist),
         'time': str(time)
     }
     return result

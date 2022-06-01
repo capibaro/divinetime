@@ -27,7 +27,15 @@ border = [102.9, 30.09, 104.9, 31.44]
 
 @app.route('/', methods=['GET'])
 def root():
-    return jsonify({'msg' : 'Try POSTing to the /predict endpoint with a proper path infomation'})
+    return jsonify({
+        'msg' : {
+            'clue': 'Try POSTing to the /predict endpoint with a proper path information like this.',
+            'example' : {
+                    'coords' : '[104.098078,30.66],[104.098016,30.6599],...]',
+                    'distance': '5.2959'
+                }
+            }
+        })
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -36,7 +44,7 @@ def predict():
         if json_data is not None:
             coordinates = json_data['coords']
             coords = helper.resample(coordinates)
-            distance = json_data['dist']
+            distance = json_data['distance']
             start = datetime.now()
             data = helper.transform(coords, distance, start, short_ttf, long_ttf, upstream)
             attr, traj = helper.convert(data)
@@ -45,5 +53,4 @@ def predict():
             return jsonify(result)
 
 if __name__ == '__main__':
-    app.debug = True
     app.run()
